@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour {
     public int hp;
     public float movementSpeed;
     public float jumpStrength;
+    public float bulletStrength;
     public float setMoveLimit;
     
     public LayerMask groundLayer;
@@ -113,7 +114,7 @@ public class PlayerController : MonoBehaviour {
         {
             newBullet.layer = 10;
         }
-        newBullet.GetComponent<Rigidbody2D>().AddForce(mouseDir * 500);
+        newBullet.GetComponent<Rigidbody2D>().AddForce(mouseDir * bulletStrength * 1000);
 
         shot = true;
     }

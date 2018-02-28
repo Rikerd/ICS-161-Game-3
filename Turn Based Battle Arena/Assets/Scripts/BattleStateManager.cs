@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BattleStateManager : MonoBehaviour {
     public GameObject player;
@@ -9,6 +10,9 @@ public class BattleStateManager : MonoBehaviour {
     public int numberOfIterations;
 
     public float setTurnTimer;
+
+    public Text player1HealthText;
+    public Text player2HealthText;
     
     private PlayerController player1Controller;
     private PlayerController player2Controller;
@@ -40,12 +44,33 @@ public class BattleStateManager : MonoBehaviour {
 	
 	private void Update () {
         print(currentState);
+        // Checks if game is over
         if (checkedPlayersDead() && checkIfInitialStates())
         {
             currentState = BattleStates.GameOver;
         }
 
-		switch(currentState)
+        // Update UI Accordingly
+        if (player1Controller != null)
+        {
+            player1HealthText.text = "Health: " + player1Controller.hp;
+        }
+        else
+        {
+            player1HealthText.text = "Health: 0";
+        }
+
+        if (player2Controller != null)
+        {
+            player2HealthText.text = "Health: " + player2Controller.hp;
+        }
+        else
+        {
+            player2HealthText.text = "Health: 0";
+        }
+
+        // Checks and perform the proper state
+        switch (currentState)
         {
             case (BattleStates.GenerateMap):
                 tileGenerator.doSimulation(numberOfIterations);
@@ -137,7 +162,7 @@ public class BattleStateManager : MonoBehaviour {
                 Debug.Log("VICTORY");
                 break;
         }
-	}
+    }
     
     public bool checkedPlayersDead()
     {
