@@ -40,6 +40,10 @@ public class BattleStateManager : MonoBehaviour {
 	
 	private void Update () {
         print(currentState);
+        if (checkedPlayersDead() && checkIfInitialStates())
+        {
+            currentState = BattleStates.GameOver;
+        }
 
 		switch(currentState)
         {
@@ -48,22 +52,26 @@ public class BattleStateManager : MonoBehaviour {
                 currentState = BattleStates.SpawnPlayer1;
                 break;
             case (BattleStates.SpawnPlayer1):
+                // Spawn Player 1
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     GameObject player1 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
                     player1.layer = 9;
+                    player1.GetComponent<SpriteRenderer>().color = new Color(0, 171, 255);
                     player1Controller = player1.GetComponent<PlayerController>();
 
                     currentState = BattleStates.SpawnPlayer2;
                 }
                 break;
             case (BattleStates.SpawnPlayer2):
+                // Spawn Player 2
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     GameObject player2 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
                     player2.layer = 10;
+                    player2.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0);
                     player2Controller = player2.GetComponent<PlayerController>();
 
                     currentState = BattleStates.StartGame;
@@ -118,8 +126,26 @@ public class BattleStateManager : MonoBehaviour {
                 currentState = BattleStates.StartPlayer1Turn;
                 break;
             case (BattleStates.GameOver):
+                if (player1Controller != null)
+                {
+                    player1Controller.endTurn();
+                } else if (player2Controller != null)
+                {
+                    player2Controller.endTurn();
+                }
+
                 Debug.Log("VICTORY");
                 break;
         }
 	}
+    
+    public bool checkedPlayersDead()
+    {
+        return (player1Controller == null || player2Controller == null);
+    }
+
+    public bool checkIfInitialStates()
+    {
+        return (currentState != BattleStates.GenerateMap && currentState != BattleStates.SpawnPlayer1 && currentState != BattleStates.SpawnPlayer2);
+    }
 }

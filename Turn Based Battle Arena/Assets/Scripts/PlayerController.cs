@@ -159,4 +159,12 @@ public class PlayerController : MonoBehaviour {
     {
         hp -= dmg;
     }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Lava")
+        {
+            Destroy(gameObject);
+        }
+    }
 }
