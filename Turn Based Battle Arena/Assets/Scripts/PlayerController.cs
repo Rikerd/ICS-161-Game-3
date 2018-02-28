@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour {
     public int hp;
     public float movementSpeed;
     public float jumpStrength;
+    public float setMoveLimit;
     
     public LayerMask groundLayer;
 
@@ -16,6 +17,7 @@ public class PlayerController : MonoBehaviour {
     private bool currentTurn;
     private bool grounded;
     private bool shot;
+    private float moveLimit;
     private bool isPlayer1;
 
     private void Awake()
@@ -26,6 +28,7 @@ public class PlayerController : MonoBehaviour {
         rb2d.gravityScale = 0;
         grounded = false;
         shot = false;
+        moveLimit = setMoveLimit;
     }
 
     private void Update()
@@ -52,7 +55,10 @@ public class PlayerController : MonoBehaviour {
                 rb2d.AddForce(transform.up * jumpStrength * 100);
             }
 
-            Move();
+            if (moveLimit > 0)
+            {
+                Move();
+            }
         }
     }
 
@@ -75,6 +81,13 @@ public class PlayerController : MonoBehaviour {
         Vector2 movement = input * movementSpeed * Time.deltaTime;
 
         rb2d.position += movement;
+        if (movement.x > 0)
+        {
+            moveLimit -= movement.x;
+        } else
+        {
+            moveLimit += movement.x;
+        }
     }
 
     private void FaceMouse()
@@ -128,6 +141,7 @@ public class PlayerController : MonoBehaviour {
     {
         currentTurn = true;
         shot = false;
+        moveLimit = setMoveLimit;
     }
 
     public void endTurn()
