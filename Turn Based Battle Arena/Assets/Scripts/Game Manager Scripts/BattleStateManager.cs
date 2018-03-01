@@ -76,8 +76,6 @@ public class BattleStateManager : MonoBehaviour {
     }
 
     private void Update () {
-        print(currentState);
-
         // Checks if game is over
         if (checkedPlayersDead() && checkIfInitialStates())
         {

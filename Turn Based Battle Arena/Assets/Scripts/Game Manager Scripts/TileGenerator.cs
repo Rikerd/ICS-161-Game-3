@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEditor;
-
-// Tutorial Used: https://www.youtube.com/watch?v=xNqqfABXTNQ
-// Created By: Richard But
-// Last Updated: 2/8/18
 
 public class TileGenerator : MonoBehaviour {
 
