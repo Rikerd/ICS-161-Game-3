@@ -15,7 +15,9 @@ public class BattleStateManager : MonoBehaviour {
     public Text timerText;
 
     public Text player1HealthText;
+    public Text player1MovementText;
     public Text player2HealthText;
+    public Text player2MovementText;
 
     public Text spawnPrompter;
 
@@ -35,6 +37,8 @@ public class BattleStateManager : MonoBehaviour {
 
     private Color prompterOriginalColor;
     private Color prompterEndColor;
+
+    private bool initialGameOver;
 
     public enum BattleStates
     {
@@ -60,6 +64,7 @@ public class BattleStateManager : MonoBehaviour {
         fadeAnimationState = "Fade In";
         fadeTimePassed = 0f;
         timerReset = false;
+        initialGameOver = true;
     }
 
     private void Start()
@@ -83,22 +88,26 @@ public class BattleStateManager : MonoBehaviour {
         if (player1Controller != null)
         {
             player1HealthText.text = "Health: " + player1Controller.hp;
+            player1MovementText.text = "Movement: " + player1Controller.getMoveLimit().ToString("F2");
         }
         else
         {
             player1HealthText.text = "Health: 0";
+            player1MovementText.text = "Movement: 0.00";
         }
 
         if (player2Controller != null)
         {
             player2HealthText.text = "Health: " + player2Controller.hp;
+            player2MovementText.text = "Movement: " + player2Controller.getMoveLimit().ToString("F2");
         }
         else
         {
             player2HealthText.text = "Health: 0";
+            player1MovementText.text = "Movement: 0.00";
         }
 
-        timerText.text = "" + (int) turnTimer;
+        timerText.text = turnTimer.ToString("F2");
 
         // Checks and perform the proper state
         switch (currentState)
@@ -187,7 +196,14 @@ public class BattleStateManager : MonoBehaviour {
 
                 if (player1Controller.didShoot() && !timerReset)
                 {
-                    turnTimer = setTurnTimerAfterShooting;
+                    if (player1Controller.getMoveLimit() == 0f)
+                    {
+                        turnTimer = 0f;
+                    } else
+                    {
+                        turnTimer = setTurnTimerAfterShooting;
+                    }
+
                     timerReset = true;
                 }
 
@@ -247,7 +263,15 @@ public class BattleStateManager : MonoBehaviour {
 
                 if (player2Controller.didShoot() && !timerReset)
                 {
-                    turnTimer = setTurnTimerAfterShooting;
+                    if (player2Controller.getMoveLimit() == 0f)
+                    {
+                        turnTimer = 0f;
+                    }
+                    else
+                    {
+                        turnTimer = setTurnTimerAfterShooting;
+                    }
+
                     timerReset = true;
                 }
 
@@ -265,17 +289,28 @@ public class BattleStateManager : MonoBehaviour {
                 currentState = BattleStates.StartPlayer1Turn;
                 break;
             case (BattleStates.GameOver):
+                if (initialGameOver)
+                {
+                    prompter.color = prompterOriginalColor;
+                    initialGameOver = false;
+                }
+
                 if (player1Controller != null)
                 {
                     player1Controller.endTurn();
+                    prompter.text = "Player 1 Wins!";
                 } else if (player2Controller != null)
                 {
                     player2Controller.endTurn();
+                    prompter.text = "Player 2 Wins!";
                 }
 
-                prompter.color = prompterOriginalColor;
+                if (fadeTimePassed < promptFadeDuration)
+                {
+                    fadeTimePassed += Time.deltaTime;
+                    prompter.color = Color.Lerp(prompterOriginalColor, prompterEndColor, fadeTimePassed / promptFadeDuration);
+                }
 
-                Debug.Log("VICTORY");
                 break;
         }
     }

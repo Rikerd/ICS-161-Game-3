@@ -122,8 +122,10 @@ public class PlayerController : MonoBehaviour {
     private void checkGrounded()
     {
         RaycastHit2D downRay = Physics2D.Raycast(transform.position, Vector2.down, 1f, groundLayer);
+        RaycastHit2D halfDownRay1 = Physics2D.Raycast(transform.position + Vector3.left, Vector3.down, 0.75f, groundLayer);
+        RaycastHit2D halfDownRay2 = Physics2D.Raycast(transform.position + Vector3.right, Vector3.down, 0.75f, groundLayer);
 
-        if (downRay.collider != null)
+        if (downRay.collider != null || halfDownRay1.collider != null || halfDownRay2.collider != null)
         {
             grounded = true;
         } else
@@ -154,6 +156,17 @@ public class PlayerController : MonoBehaviour {
     public bool didShoot()
     {
         return shot;
+    }
+
+    public float getMoveLimit()
+    {
+        if (moveLimit > 0f)
+        {
+            return moveLimit;
+        }  else
+        {
+            return 0f;
+        }
     }
 
     public void doDamage(int dmg)
