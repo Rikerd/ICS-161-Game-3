@@ -17,10 +17,11 @@ public class BattleStateManager : MonoBehaviour {
     public Text player1HealthText;
     public Text player2HealthText;
 
+    public Text spawnPrompter;
+
     public float promptTime;
     public float promptFadeDuration;
-    public Text player1TurnPrompt;
-    public Text player2TurnPrompt;
+    public Text prompter;
     
     private PlayerController player1Controller;
     private PlayerController player2Controller;
@@ -32,10 +33,8 @@ public class BattleStateManager : MonoBehaviour {
 
     private bool timerReset;
 
-    private Color player1TurnPromptOriginalColor;
-    private Color player1TurnPromptEndColor;
-    private Color player2TurnPromptOriginalColor;
-    private Color player2TurnPromptEndColor;
+    private Color prompterOriginalColor;
+    private Color prompterEndColor;
 
     public enum BattleStates
     {
@@ -65,11 +64,10 @@ public class BattleStateManager : MonoBehaviour {
 
     private void Start()
     {
-        player1TurnPromptOriginalColor = player1TurnPrompt.color;
-        player1TurnPromptEndColor = new Color(player1TurnPrompt.color.r, player1TurnPrompt.color.g, player1TurnPrompt.color.b, 1);
+        prompterOriginalColor = prompter.color;
+        prompterEndColor = new Color(prompter.color.r, prompter.color.g, prompter.color.b, 1);
 
-        player2TurnPromptOriginalColor = player2TurnPrompt.color;
-        player2TurnPromptEndColor = new Color(player2TurnPrompt.color.r, player2TurnPrompt.color.g, player2TurnPrompt.color.b, 1);
+        spawnPrompter.text = "";
     }
 
     private void Update () {
@@ -111,6 +109,8 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.SpawnPlayer1):
                 // Spawn Player 1
+                spawnPrompter.text = "SPAWN PLAYER 1";
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -124,6 +124,8 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.SpawnPlayer2):
                 // Spawn Player 2
+                spawnPrompter.text = "SPAWN PLAYER 2";
+
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -132,6 +134,7 @@ public class BattleStateManager : MonoBehaviour {
                     player2.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0);
                     player2Controller = player2.GetComponent<PlayerController>();
 
+                    spawnPrompter.text = "";
                     currentState = BattleStates.StartGame;
                 }
                 break;
@@ -143,10 +146,12 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.StartPlayer1Turn):
                 // Start Player 1 Turn
+                prompter.text = "PLAYER 1 TURN";
+
                 if (fadeAnimationState == "Fade In")
                 {
                     fadeTimePassed += Time.deltaTime;
-                    player1TurnPrompt.color = Color.Lerp(player1TurnPromptOriginalColor, player1TurnPromptEndColor, fadeTimePassed / promptFadeDuration);
+                    prompter.color = Color.Lerp(prompterOriginalColor, prompterEndColor, fadeTimePassed / promptFadeDuration);
                 }
                 else if (fadeAnimationState == "Display Prompt")
                 {
@@ -155,7 +160,7 @@ public class BattleStateManager : MonoBehaviour {
                 else if (fadeAnimationState == "Fade Out")
                 {
                     fadeTimePassed += Time.deltaTime;
-                    player1TurnPrompt.color = Color.Lerp(player1TurnPromptEndColor, player1TurnPromptOriginalColor, fadeTimePassed / promptFadeDuration);
+                    prompter.color = Color.Lerp(prompterEndColor, prompterOriginalColor, fadeTimePassed / promptFadeDuration);
                 }
 
                 if (fadeTimePassed > promptFadeDuration && fadeAnimationState == "Fade In")
@@ -201,10 +206,12 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.StartPlayer2Turn):
                 // Start Player 2 Turn
+                prompter.text = "PLAYER 2 TURN";
+
                 if (fadeAnimationState == "Fade In")
                 {
                     fadeTimePassed += Time.deltaTime;
-                    player2TurnPrompt.color = Color.Lerp(player2TurnPromptOriginalColor, player2TurnPromptEndColor, fadeTimePassed / promptFadeDuration);
+                    prompter.color = Color.Lerp(prompterOriginalColor, prompterEndColor, fadeTimePassed / promptFadeDuration);
                 }
                 else if (fadeAnimationState == "Display Prompt")
                 {
@@ -213,7 +220,7 @@ public class BattleStateManager : MonoBehaviour {
                 else if (fadeAnimationState == "Fade Out")
                 {
                     fadeTimePassed += Time.deltaTime;
-                    player2TurnPrompt.color = Color.Lerp(player2TurnPromptEndColor, player2TurnPromptOriginalColor, fadeTimePassed / promptFadeDuration);
+                    prompter.color = Color.Lerp(prompterEndColor, prompterOriginalColor, fadeTimePassed / promptFadeDuration);
                 }
 
                 if (fadeTimePassed > promptFadeDuration && fadeAnimationState == "Fade In")
@@ -266,8 +273,7 @@ public class BattleStateManager : MonoBehaviour {
                     player2Controller.endTurn();
                 }
 
-                player1TurnPrompt.color = player1TurnPromptOriginalColor;
-                player2TurnPrompt.color = player2TurnPromptOriginalColor;
+                prompter.color = prompterOriginalColor;
 
                 Debug.Log("VICTORY");
                 break;
