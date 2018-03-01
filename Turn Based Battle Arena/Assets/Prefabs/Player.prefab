@@ -163,7 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 3
   movementSpeed: 4.5
-  jumpStrength: 4.5
+  jumpStrength: 4
   bulletStrength: 1
   setMoveLimit: 4
   groundLayer:
