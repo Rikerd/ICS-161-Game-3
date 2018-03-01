@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour {
 
             FaceMouse();
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !shot)
             {
                 Fire();
             }
