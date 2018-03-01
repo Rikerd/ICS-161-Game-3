@@ -10,6 +10,9 @@ public class BattleStateManager : MonoBehaviour {
     public int numberOfIterations;
 
     public float setTurnTimer;
+    public float setTurnTimerAfterShooting;
+
+    public Text timerText;
 
     public Text player1HealthText;
     public Text player2HealthText;
@@ -27,7 +30,7 @@ public class BattleStateManager : MonoBehaviour {
     private float fadeTimePassed;
     private string fadeAnimationState;
 
-    private bool coroutineStarted;
+    private bool timerReset;
 
     private Color player1TurnPromptOriginalColor;
     private Color player1TurnPromptEndColor;
@@ -57,6 +60,7 @@ public class BattleStateManager : MonoBehaviour {
         turnTimer = setTurnTimer;
         fadeAnimationState = "Fade In";
         fadeTimePassed = 0f;
+        timerReset = false;
     }
 
     private void Start()
@@ -95,6 +99,8 @@ public class BattleStateManager : MonoBehaviour {
         {
             player2HealthText.text = "Health: 0";
         }
+
+        timerText.text = "" + (int) turnTimer;
 
         // Checks and perform the proper state
         switch (currentState)
@@ -174,8 +180,15 @@ public class BattleStateManager : MonoBehaviour {
             case (BattleStates.Player1Turn):
                 turnTimer -= Time.deltaTime;
 
-                if (turnTimer <= 0f || player1Controller.didShoot())
+                if (player1Controller.didShoot() && !timerReset)
                 {
+                    turnTimer = setTurnTimerAfterShooting;
+                    timerReset = true;
+                }
+
+                if (turnTimer <= 0f)
+                {
+                    timerReset = false;
                     currentState = BattleStates.EndPlayer1Turn;
                 }
                 break;
@@ -225,8 +238,15 @@ public class BattleStateManager : MonoBehaviour {
             case (BattleStates.Player2Turn):
                 turnTimer -= Time.deltaTime;
 
-                if (turnTimer <= 0f || player2Controller.didShoot())
+                if (player2Controller.didShoot() && !timerReset)
                 {
+                    turnTimer = setTurnTimerAfterShooting;
+                    timerReset = true;
+                }
+
+                if (turnTimer <= 0f)
+                {
+                    timerReset = false;
                     currentState = BattleStates.EndPlayer2Turn;
                 }
                 break;
@@ -262,10 +282,5 @@ public class BattleStateManager : MonoBehaviour {
     public bool checkIfInitialStates()
     {
         return (currentState != BattleStates.GenerateMap && currentState != BattleStates.SpawnPlayer1 && currentState != BattleStates.SpawnPlayer2);
-    }
-
-    IEnumerator PromptPlayerTurn()
-    {
-        yield return new WaitForSeconds(promptFadeDuration);
     }
 }
