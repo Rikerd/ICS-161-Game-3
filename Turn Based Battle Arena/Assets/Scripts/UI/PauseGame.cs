@@ -14,16 +14,14 @@ public class PauseGame : MonoBehaviour {
         pauseMenu.SetActive(false);
         controlsMenu.SetActive(false);
         paused = false;
-        //player = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
     void Update() {
-        /*
-	    if (Input.GetKeyDown(KeyCode.Escape) && !player.isPlayerDead())
+	    if (Input.GetKeyDown(KeyCode.Escape))
         {
             Pause();
-        }*/
+        }
 	}
 
     public void Pause()
