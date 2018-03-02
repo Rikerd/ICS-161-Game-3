@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour {
     private bool shot;
     private float moveLimit;
     private bool isPlayer1;
+    private SpriteRenderer sprite;
 
     private void Awake()
     {
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour {
         grounded = false;
         shot = false;
         moveLimit = setMoveLimit;
+        sprite = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
@@ -117,6 +119,7 @@ public class PlayerController : MonoBehaviour {
         {
             newBullet.layer = 10;
         }
+        newBullet.GetComponent<SpriteRenderer>().color = sprite.color;
         newBullet.GetComponent<Rigidbody2D>().AddForce(mouseDir * bulletStrength * 1000);
 
         shot = true;
