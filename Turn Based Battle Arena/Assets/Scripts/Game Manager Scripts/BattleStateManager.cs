@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Tilemaps;
 
 public class BattleStateManager : MonoBehaviour {
     public GameObject player;
 
     [Range(1, 10)]
     public int numberOfIterations;
+    public GridLayout grid;
+    public Tilemap tilemap;
 
     public float setTurnTimer;
     public float setTurnTimerAfterShooting;
@@ -132,12 +135,18 @@ public class BattleStateManager : MonoBehaviour {
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    GameObject player1 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
-                    player1.layer = 9;
-                    player1.GetComponent<SpriteRenderer>().color = new Color(0, 171, 255);
-                    player1Controller = player1.GetComponent<PlayerController>();
 
-                    currentState = BattleStates.SpawnPlayer2;
+                    Vector3Int tileCheckPosition = grid.WorldToCell(mousePos);
+
+                    if (!tilemap.HasTile(tileCheckPosition))
+                    {
+                        GameObject player1 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
+                        player1.layer = 9;
+                        player1.GetComponent<SpriteRenderer>().color = new Color(0, 171, 255);
+                        player1Controller = player1.GetComponent<PlayerController>();
+
+                        currentState = BattleStates.SpawnPlayer2;
+                    }
                 }
                 break;
             case (BattleStates.SpawnPlayer2):
@@ -147,13 +156,19 @@ public class BattleStateManager : MonoBehaviour {
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    GameObject player2 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
-                    player2.layer = 10;
-                    player2.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0);
-                    player2Controller = player2.GetComponent<PlayerController>();
 
-                    spawnPrompter.text = "";
-                    currentState = BattleStates.StartGame;
+                    Vector3Int tileCheckPosition = grid.WorldToCell(mousePos);
+
+                    if (!tilemap.HasTile(tileCheckPosition))
+                    {
+                        GameObject player2 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
+                        player2.layer = 10;
+                        player2.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0);
+                        player2Controller = player2.GetComponent<PlayerController>();
+
+                        spawnPrompter.text = "";
+                        currentState = BattleStates.StartGame;
+                    }
                 }
                 break;
             case (BattleStates.StartGame):

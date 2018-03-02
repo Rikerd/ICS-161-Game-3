@@ -515,6 +515,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1475541986215172, guid: 75cdf6ae590e62f479ff76b4142637c2, type: 2}
   numberOfIterations: 2
+  grid: {fileID: 1452871812}
+  tilemap: {fileID: 1816789651}
   setTurnTimer: 15
   setTurnTimerAfterShooting: 3
   timerText: {fileID: 759058208}
