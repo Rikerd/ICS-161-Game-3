@@ -16,10 +16,8 @@ public class BattleStateManager : MonoBehaviour {
     public float setTurnTimerAfterShooting;
 
     public Text timerText;
-
-    public Text player1HealthText;
+    
     public Text player1MovementText;
-    public Text player2HealthText;
     public Text player2MovementText;
 
     public Text spawnPrompter;
@@ -32,6 +30,11 @@ public class BattleStateManager : MonoBehaviour {
 
     private PlayerController player1Controller;
     private PlayerController player2Controller;
+
+    private PlayerController[] player1Controllers;
+    private PlayerController[] player2Controllers;
+    private int charactersForEachPlayer;
+
     private TileGenerator tileGenerator;
     private float turnTimer;
 
@@ -73,6 +76,9 @@ public class BattleStateManager : MonoBehaviour {
         timerReset = false;
         initialGameOver = true;
         tracking = true;
+
+        player1Controllers = new PlayerController[charactersForEachPlayer];
+        player2Controllers = new PlayerController[charactersForEachPlayer];
     }
 
     private void Start()
@@ -93,23 +99,19 @@ public class BattleStateManager : MonoBehaviour {
         // Update UI Accordingly
         if (player1Controller != null)
         {
-            player1HealthText.text = "Health: " + player1Controller.hp;
             player1MovementText.text = "Movement: " + player1Controller.getMoveLimit().ToString("F2");
         }
         else
         {
-            player1HealthText.text = "Health: 0";
             player1MovementText.text = "Movement: 0.00";
         }
 
         if (player2Controller != null)
         {
-            player2HealthText.text = "Health: " + player2Controller.hp;
             player2MovementText.text = "Movement: " + player2Controller.getMoveLimit().ToString("F2");
         }
         else
         {
-            player2HealthText.text = "Health: 0";
             player1MovementText.text = "Movement: 0.00";
         }
 

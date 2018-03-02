@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
     public int hp;
@@ -22,20 +23,28 @@ public class PlayerController : MonoBehaviour {
     private bool isPlayer1;
     private SpriteRenderer sprite;
 
+    private Text playerUI;
+
     private void Awake()
     {
         rb2d = GetComponent<Rigidbody2D>();
-        currentTurn = false;
-        arm = transform.GetChild(0);
         rb2d.gravityScale = 0;
+        
+        currentTurn = false;
         grounded = false;
         shot = false;
         moveLimit = setMoveLimit;
+
+        arm = transform.GetChild(0);
         sprite = GetComponent<SpriteRenderer>();
+        playerUI = GetComponentInChildren<Text>();
     }
 
     private void Update()
     {
+        playerUI.color = sprite.color;
+        playerUI.text = "HP: " + hp;
+
         if (currentTurn && Time.timeScale != 0)
         {
             checkGrounded();
