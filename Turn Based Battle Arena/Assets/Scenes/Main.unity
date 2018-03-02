@@ -526,6 +526,7 @@ MonoBehaviour:
   promptTime: 0.3
   promptFadeDuration: 1
   prompter: {fileID: 781027297}
+  cameraScript: {fileID: 1346328964}
 --- !u!114 &170584105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5468,6 +5469,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 3
   dragSpeed: 0.6
+  zoom: 5
 --- !u!1 &1452871811
 GameObject:
   m_ObjectHideFlags: 0

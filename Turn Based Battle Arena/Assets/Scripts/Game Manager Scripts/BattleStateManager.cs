@@ -24,7 +24,9 @@ public class BattleStateManager : MonoBehaviour {
     public float promptTime;
     public float promptFadeDuration;
     public Text prompter;
-    
+
+    public CameraScript cameraScript;
+
     private PlayerController player1Controller;
     private PlayerController player2Controller;
     private TileGenerator tileGenerator;
@@ -39,6 +41,8 @@ public class BattleStateManager : MonoBehaviour {
     private Color prompterEndColor;
 
     private bool initialGameOver;
+
+    private bool tracking;
 
     public enum BattleStates
     {
@@ -65,6 +69,7 @@ public class BattleStateManager : MonoBehaviour {
         fadeTimePassed = 0f;
         timerReset = false;
         initialGameOver = true;
+        tracking = true;
     }
 
     private void Start()
@@ -149,11 +154,19 @@ public class BattleStateManager : MonoBehaviour {
                 player1Controller.gameStart(true);
                 player2Controller.gameStart(false);
 
+                tracking = true;
+
                 currentState = BattleStates.StartPlayer1Turn;
                 break;
             case (BattleStates.StartPlayer1Turn):
                 // Start Player 1 Turn
                 prompter.text = "PLAYER 1 TURN";
+
+                if (tracking)
+                {
+                    cameraScript.CameraTracking(player1Controller.gameObject.transform.position, promptFadeDuration);
+                    tracking = false;
+                }
 
                 if (fadeAnimationState == "Fade In")
                 {
@@ -215,12 +228,19 @@ public class BattleStateManager : MonoBehaviour {
                 // End Player 1 Turn
                 player1Controller.endTurn();
                 turnTimer = setTurnTimer;
+                tracking = true;
 
                 currentState = BattleStates.StartPlayer2Turn;
                 break;
             case (BattleStates.StartPlayer2Turn):
                 // Start Player 2 Turn
                 prompter.text = "PLAYER 2 TURN";
+
+                if (tracking)
+                {
+                    cameraScript.CameraTracking(player2Controller.gameObject.transform.position, promptFadeDuration);
+                    tracking = false;
+                }
 
                 if (fadeAnimationState == "Fade In")
                 {
@@ -283,6 +303,7 @@ public class BattleStateManager : MonoBehaviour {
                 // End Player 2 Turn
                 player2Controller.endTurn();
                 turnTimer = setTurnTimer;
+                tracking = true;
 
                 currentState = BattleStates.StartPlayer1Turn;
                 break;
