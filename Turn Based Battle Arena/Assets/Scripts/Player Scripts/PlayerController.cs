@@ -44,6 +44,9 @@ public class PlayerController : MonoBehaviour {
             {
                 Fire();
             }
+        } else if (hp <= 0 && Time.timeScale != 0)
+        {
+            Destroy(gameObject);
         }
     }
 

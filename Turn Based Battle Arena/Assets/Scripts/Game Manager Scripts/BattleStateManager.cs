@@ -110,7 +110,13 @@ public class BattleStateManager : MonoBehaviour {
             player1MovementText.text = "Movement: 0.00";
         }
 
-        timerText.text = turnTimer.ToString("F2");
+        if (turnTimer < 0f)
+        {
+            timerText.text = ("0.00");
+        } else
+        {
+            timerText.text = turnTimer.ToString("F2");
+        }
 
         // Checks and perform the proper state
         switch (currentState)
