@@ -29,11 +29,9 @@ public class CameraScript : MonoBehaviour {
             
             transform.position = Vector3.Lerp(originalPos, playerPos, timePassed / trackingDuration);
             Camera.main.orthographicSize = Mathf.Lerp(originalZoom, zoom, timePassed / trackingDuration);
-            print(Camera.main.orthographicSize);
 
             if (timePassed > trackingDuration)
             {
-                print("hi");
                 tracking = false;
             }
         } else
