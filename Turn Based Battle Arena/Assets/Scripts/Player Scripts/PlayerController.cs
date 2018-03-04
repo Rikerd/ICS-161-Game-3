@@ -18,7 +18,6 @@ public class PlayerController : MonoBehaviour {
     private Transform arm;
     private bool activeCharacter;
     private bool grounded;
-    private bool shot;
     private bool isPlayer1;
     private SpriteRenderer sprite;
 
@@ -33,7 +32,6 @@ public class PlayerController : MonoBehaviour {
 
         activeCharacter = false;
         grounded = false;
-        shot = false;
 
         arm = transform.GetChild(0);
         sprite = GetComponent<SpriteRenderer>();
@@ -47,13 +45,16 @@ public class PlayerController : MonoBehaviour {
 
         if (activeCharacter && Time.timeScale != 0)
         {
-            checkGrounded();
-
             FaceMouse();
 
-            if (Input.GetMouseButtonDown(0) && !shot)
+            if (Input.GetMouseButtonDown(0) && !manager.shot)
             {
                 Fire();
+            }
+
+            if (Input.GetKey(KeyCode.Space) && grounded)
+            {
+                rb2d.AddForce(Vector2.up * jumpStrength * 100);
             }
         } else if (hp <= 0 && Time.timeScale != 0)
         {
@@ -64,17 +65,9 @@ public class PlayerController : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        if (activeCharacter)
+        if (activeCharacter && manager.movementLimit > 0f)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && grounded)
-            {
-                rb2d.AddForce(transform.up * jumpStrength * 100);
-            }
-
-            if (manager.movementLimit > 0f)
-            {
-                Move();
-            }
+            Move();
         }
     }
 
@@ -91,7 +84,7 @@ public class PlayerController : MonoBehaviour {
         {
             input += Vector3.left;
         }
-
+        
         input.Normalize();
 
         Vector2 movement = input * movementSpeed * Time.deltaTime;
@@ -133,22 +126,7 @@ public class PlayerController : MonoBehaviour {
         newBullet.GetComponent<SpriteRenderer>().color = sprite.color;
         newBullet.GetComponent<Rigidbody2D>().AddForce(mouseDir * bulletStrength * 1000);
 
-        shot = true;
-    }
-
-    private void checkGrounded()
-    {
-        RaycastHit2D downRay = Physics2D.Raycast(transform.position, Vector2.down, 1f, groundLayer);
-        RaycastHit2D halfDownRay1 = Physics2D.Raycast(transform.position + (Vector3.left * 3 / 4), Vector3.down, 0.75f, groundLayer);
-        RaycastHit2D halfDownRay2 = Physics2D.Raycast(transform.position + (Vector3.right * 3 / 4), Vector3.down, 0.75f, groundLayer);
-
-        if (downRay.collider != null || halfDownRay1.collider != null || halfDownRay2.collider != null)
-        {
-            grounded = true;
-        } else
-        {
-            grounded = false;
-        }
+        manager.shot = true;
     }
 
     public void gameStart(bool player1)
@@ -174,10 +152,23 @@ public class PlayerController : MonoBehaviour {
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.tag == "Walls")
+        {
+            grounded = true;
+        }
+
         if (collision.gameObject.tag == "Lava")
         {
             manager.deleteCharacter(isPlayer1, this);
             Destroy(gameObject);
+        }
+    }
+
+    public void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Walls")
+        {
+            grounded = false;
         }
     }
 }

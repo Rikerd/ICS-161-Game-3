@@ -12,6 +12,8 @@ public class BattleStateManager : MonoBehaviour {
 
     [HideInInspector]
     public float movementLimit;
+    [HideInInspector]
+    public bool shot;
 
     [Range(1, 10)]
     public int numberOfIterations;
@@ -19,6 +21,7 @@ public class BattleStateManager : MonoBehaviour {
     public Tilemap tilemap;
 
     public float setTurnTimer;
+    public float setTurnTimerWithNoMovement;
     public float setTurnTimerAfterShooting;
 
     public Text timerText;
@@ -80,6 +83,7 @@ public class BattleStateManager : MonoBehaviour {
         fadeAnimationState = "Fade In";
         fadeTimePassed = 0f;
         timerReset = false;
+        shot = false;
         initialGameOver = true;
         cameraMoving = true;
 
@@ -255,83 +259,72 @@ public class BattleStateManager : MonoBehaviour {
                     fadeTimePassed = 0f;
 
                     movementLimit = setMovementLimit;
+                    shot = false;
+
+                    currentCharacter = player1Controllers[0];
+                    currentCharacterIndex = 0;
+                    currentCharacter.activateCharacter();
+
+                    cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+
                     currentState = BattleStates.Player1Turn;
                 }
                 break;
             case (BattleStates.Player1Turn):
                 turnTimer -= Time.deltaTime;
-
-                /*
-                if (player1Controller.didShoot() && !timerReset)
+                
+                if (shot && !timerReset)
                 {
-                    if (player1Controller.getMoveLimit() == 0f)
+                    if (movementLimit <= 0f)
                     {
-                        turnTimer = 0f;
+                        turnTimer = setTurnTimerWithNoMovement;
                     } else
                     {
                         turnTimer = setTurnTimerAfterShooting;
                     }
 
                     timerReset = true;
-                }*/
+                }
 
                 if (Input.GetKeyDown(KeyCode.W))
                 {
-                    if (currentCharacter == null)
+                    currentCharacter.deactivateCharacter();
+                    currentCharacterIndex++;
+
+                    if (currentCharacterIndex == player1Controllers.Count)
                     {
-                        currentCharacter = player1Controllers[0];
                         currentCharacterIndex = 0;
-                        currentCharacter.activateCharacter();
-
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                    } else {
-                        currentCharacter.deactivateCharacter();
-                        currentCharacterIndex++;
-                        
-                        if (currentCharacterIndex == player1Controllers.Count)
-                        {
-                            currentCharacterIndex = 0;
-                            currentCharacter = player1Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
-
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        } else
-                        {
-                            currentCharacter = player1Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
-
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        }
-                    }
-                } else if (Input.GetKeyDown(KeyCode.S))
-                {
-                    if (currentCharacter == null)
-                    {
-                        currentCharacter = player1Controllers[0];
-                        currentCharacterIndex = 0;
+                        currentCharacter = player1Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
                         cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
                     }
                     else
                     {
-                        currentCharacter.deactivateCharacter();
-                        currentCharacterIndex--;
+                        currentCharacter = player1Controllers[currentCharacterIndex];
+                        currentCharacter.activateCharacter();
 
-                        if (currentCharacterIndex < 0)
-                        {
-                            currentCharacterIndex = player1Controllers.Count - 1;
-                            currentCharacter = player1Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    }
+                } else if (Input.GetKeyDown(KeyCode.S))
+                {
+                    currentCharacter.deactivateCharacter();
+                    currentCharacterIndex--;
 
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        } else
-                        {
-                            currentCharacter = player1Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
+                    if (currentCharacterIndex < 0)
+                    {
+                        currentCharacterIndex = player1Controllers.Count - 1;
+                        currentCharacter = player1Controllers[currentCharacterIndex];
+                        currentCharacter.activateCharacter();
 
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        }
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    }
+                    else
+                    {
+                        currentCharacter = player1Controllers[currentCharacterIndex];
+                        currentCharacter.activateCharacter();
+
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
                     }
                 }
 
@@ -391,18 +384,25 @@ public class BattleStateManager : MonoBehaviour {
                     fadeTimePassed = 0f;
 
                     movementLimit = setMovementLimit;
+                    shot = false;
+
+                    currentCharacter = player2Controllers[0];
+                    currentCharacterIndex = 0;
+                    currentCharacter.activateCharacter();
+
+                    cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+
                     currentState = BattleStates.Player2Turn;
                 }
                 break;
             case (BattleStates.Player2Turn):
                 turnTimer -= Time.deltaTime;
-
-                /*
-                if (player2Controller.didShoot() && !timerReset)
+                
+                if (shot && !timerReset)
                 {
-                    if (player2Controller.getMoveLimit() == 0f)
+                    if (movementLimit <= 0f)
                     {
-                        turnTimer = 0f;
+                        turnTimer = setTurnTimerWithNoMovement;
                     }
                     else
                     {
@@ -410,70 +410,48 @@ public class BattleStateManager : MonoBehaviour {
                     }
 
                     timerReset = true;
-                }*/
+                }
 
                 if (Input.GetKeyDown(KeyCode.W))
                 {
-                    if (currentCharacter == null)
+                    currentCharacter.deactivateCharacter();
+                    currentCharacterIndex++;
+
+                    if (currentCharacterIndex == player2Controllers.Count)
                     {
-                        currentCharacter = player2Controllers[0];
                         currentCharacterIndex = 0;
+                        currentCharacter = player2Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
                         cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
                     }
                     else
                     {
-                        currentCharacter.deactivateCharacter();
-                        currentCharacterIndex++;
+                        currentCharacter = player2Controllers[currentCharacterIndex];
+                        currentCharacter.activateCharacter();
 
-                        if (currentCharacterIndex == player2Controllers.Count)
-                        {
-                            currentCharacterIndex = 0;
-                            currentCharacter = player2Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
-
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        }
-                        else
-                        {
-                            currentCharacter = player2Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
-
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        }
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.S))
                 {
-                    if (currentCharacter == null)
+                    currentCharacter.deactivateCharacter();
+                    currentCharacterIndex--;
+
+                    if (currentCharacterIndex < 0)
                     {
-                        currentCharacter = player2Controllers[0];
-                        currentCharacterIndex = 0;
+                        currentCharacterIndex = player2Controllers.Count - 1;
+                        currentCharacter = player2Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
                         cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
                     }
                     else
                     {
-                        currentCharacter.deactivateCharacter();
-                        currentCharacterIndex--;
+                        currentCharacter = player2Controllers[currentCharacterIndex];
+                        currentCharacter.activateCharacter();
 
-                        if (currentCharacterIndex < 0)
-                        {
-                            currentCharacterIndex = player2Controllers.Count - 1;
-                            currentCharacter = player2Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
-
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        }
-                        else
-                        {
-                            currentCharacter = player2Controllers[currentCharacterIndex];
-                            currentCharacter.activateCharacter();
-
-                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
-                        }
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
                     }
                 }
 

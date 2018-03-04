@@ -220,9 +220,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hp: 3
   movementSpeed: 4.5
-  jumpStrength: 3
+  jumpStrength: 1.25
   bulletStrength: 0.75
-  setMoveLimit: 30
   groundLayer:
     serializedVersion: 2
     m_Bits: 256

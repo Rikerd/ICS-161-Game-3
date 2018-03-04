@@ -514,14 +514,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1475541986215172, guid: 75cdf6ae590e62f479ff76b4142637c2, type: 2}
-  numberOfCharacter: 2
-  setMovementLimit: 30
+  numberOfCharacter: 3
+  setMovementLimit: 45
   cameraTrackingDuration: 0.5
+  movementLimit: 0
+  shot: 0
   numberOfIterations: 2
   grid: {fileID: 1452871812}
   tilemap: {fileID: 1816789651}
-  setTurnTimer: 15
-  setTurnTimerAfterShooting: 3
+  setTurnTimer: 30
+  setTurnTimerWithNoMovement: 2
+  setTurnTimerAfterShooting: 5
   timerText: {fileID: 759058208}
   player1MovementText: {fileID: 1258431251}
   player2MovementText: {fileID: 402273390}
@@ -532,6 +535,8 @@ MonoBehaviour:
   cameraScript: {fileID: 1346328964}
   originalZoom: 25
   playerZoom: 7
+  player1Controllers: []
+  player2Controllers: []
 --- !u!114 &170584105
 MonoBehaviour:
   m_ObjectHideFlags: 0
