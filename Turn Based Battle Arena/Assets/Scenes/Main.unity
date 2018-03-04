@@ -514,21 +514,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1475541986215172, guid: 75cdf6ae590e62f479ff76b4142637c2, type: 2}
+  numberOfCharacter: 2
+  setMovementLimit: 30
+  cameraTrackingDuration: 0.5
   numberOfIterations: 2
   grid: {fileID: 1452871812}
   tilemap: {fileID: 1816789651}
   setTurnTimer: 15
   setTurnTimerAfterShooting: 3
   timerText: {fileID: 759058208}
-  player1HealthText: {fileID: 0}
   player1MovementText: {fileID: 1258431251}
-  player2HealthText: {fileID: 0}
   player2MovementText: {fileID: 402273390}
   spawnPrompter: {fileID: 21841164}
   promptTime: 0.3
   promptFadeDuration: 1
   prompter: {fileID: 781027297}
   cameraScript: {fileID: 1346328964}
+  originalZoom: 25
+  playerZoom: 7
 --- !u!114 &170584105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5393,7 +5396,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   movementSpeed: 3
   dragSpeed: 0.6
-  zoom: 5
 --- !u!1 &1452871811
 GameObject:
   m_ObjectHideFlags: 0

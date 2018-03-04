@@ -8,18 +8,17 @@ public class PlayerController : MonoBehaviour {
     public float movementSpeed;
     public float jumpStrength;
     public float bulletStrength;
-    public float setMoveLimit;
     
     public LayerMask groundLayer;
 
     public GameObject bullet;
 
+    private BattleStateManager manager;
     private Rigidbody2D rb2d;
     private Transform arm;
-    private bool currentTurn;
+    private bool activeCharacter;
     private bool grounded;
     private bool shot;
-    private float moveLimit;
     private bool isPlayer1;
     private SpriteRenderer sprite;
 
@@ -27,13 +26,14 @@ public class PlayerController : MonoBehaviour {
 
     private void Awake()
     {
+        manager = GameObject.Find("GameManager").GetComponent<BattleStateManager>();
+
         rb2d = GetComponent<Rigidbody2D>();
         rb2d.gravityScale = 0;
-        
-        currentTurn = false;
+
+        activeCharacter = false;
         grounded = false;
         shot = false;
-        moveLimit = setMoveLimit;
 
         arm = transform.GetChild(0);
         sprite = GetComponent<SpriteRenderer>();
@@ -45,7 +45,7 @@ public class PlayerController : MonoBehaviour {
         playerUI.color = sprite.color;
         playerUI.text = "HP: " + hp;
 
-        if (currentTurn && Time.timeScale != 0)
+        if (activeCharacter && Time.timeScale != 0)
         {
             checkGrounded();
 
@@ -57,20 +57,21 @@ public class PlayerController : MonoBehaviour {
             }
         } else if (hp <= 0 && Time.timeScale != 0)
         {
+            manager.deleteCharacter(isPlayer1, this);
             Destroy(gameObject);
         }
     }
 
     private void FixedUpdate()
     {
-        if (currentTurn)
+        if (activeCharacter)
         {
             if (Input.GetKeyDown(KeyCode.Space) && grounded)
             {
                 rb2d.AddForce(transform.up * jumpStrength * 100);
             }
 
-            if (moveLimit > 0)
+            if (manager.movementLimit > 0f)
             {
                 Move();
             }
@@ -96,12 +97,13 @@ public class PlayerController : MonoBehaviour {
         Vector2 movement = input * movementSpeed * Time.deltaTime;
 
         rb2d.position += movement;
-        if (movement.x > 0)
+
+        if (movement.x > 0f)
         {
-            moveLimit -= movement.x;
+            manager.movementLimit -= movement.x;
         } else
         {
-            moveLimit += movement.x;
+            manager.movementLimit += movement.x;
         }
     }
 
@@ -155,33 +157,14 @@ public class PlayerController : MonoBehaviour {
         isPlayer1 = player1;
     }
 
-    public void startTurn()
+    public void activateCharacter()
     {
-        currentTurn = true;
-        shot = false;
-        moveLimit = setMoveLimit;
+        activeCharacter = true;
     }
 
-    public void endTurn()
+    public void deactivateCharacter()
     {
-        currentTurn = false;
-        shot = false;
-    }
-
-    public bool didShoot()
-    {
-        return shot;
-    }
-
-    public float getMoveLimit()
-    {
-        if (moveLimit > 0f)
-        {
-            return moveLimit;
-        }  else
-        {
-            return 0f;
-        }
+        activeCharacter = false;
     }
 
     public void doDamage(int dmg)
@@ -193,6 +176,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (collision.gameObject.tag == "Lava")
         {
+            manager.deleteCharacter(isPlayer1, this);
             Destroy(gameObject);
         }
     }

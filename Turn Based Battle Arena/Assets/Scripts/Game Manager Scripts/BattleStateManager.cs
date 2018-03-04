@@ -6,6 +6,12 @@ using UnityEngine.Tilemaps;
 
 public class BattleStateManager : MonoBehaviour {
     public GameObject player;
+    public int numberOfCharacter;
+    public float setMovementLimit;
+    public float cameraTrackingDuration;
+
+    [HideInInspector]
+    public float movementLimit;
 
     [Range(1, 10)]
     public int numberOfIterations;
@@ -27,13 +33,13 @@ public class BattleStateManager : MonoBehaviour {
     public Text prompter;
 
     public CameraScript cameraScript;
+    public float originalZoom;
+    public float playerZoom;
 
-    private PlayerController player1Controller;
-    private PlayerController player2Controller;
-
-    private PlayerController[] player1Controllers;
-    private PlayerController[] player2Controllers;
-    private int charactersForEachPlayer;
+    private PlayerController currentCharacter;
+    private int currentCharacterIndex;
+    public List<PlayerController> player1Controllers;
+    public List<PlayerController> player2Controllers;
 
     private TileGenerator tileGenerator;
     private float turnTimer;
@@ -48,7 +54,7 @@ public class BattleStateManager : MonoBehaviour {
 
     private bool initialGameOver;
 
-    private bool tracking;
+    private bool cameraMoving;
 
     public enum BattleStates
     {
@@ -75,10 +81,10 @@ public class BattleStateManager : MonoBehaviour {
         fadeTimePassed = 0f;
         timerReset = false;
         initialGameOver = true;
-        tracking = true;
+        cameraMoving = true;
 
-        player1Controllers = new PlayerController[charactersForEachPlayer];
-        player2Controllers = new PlayerController[charactersForEachPlayer];
+        player1Controllers = new List<PlayerController>();
+        player2Controllers = new List<PlayerController>();
     }
 
     private void Start()
@@ -96,31 +102,43 @@ public class BattleStateManager : MonoBehaviour {
             currentState = BattleStates.GameOver;
         }
 
-        // Update UI Accordingly
-        if (player1Controller != null)
+        // Update UI
+        if (currentState == BattleStates.Player1Turn)
         {
-            player1MovementText.text = "Movement: " + player1Controller.getMoveLimit().ToString("F2");
-        }
-        else
-        {
-            player1MovementText.text = "Movement: 0.00";
-        }
-
-        if (player2Controller != null)
-        {
-            player2MovementText.text = "Movement: " + player2Controller.getMoveLimit().ToString("F2");
-        }
-        else
-        {
-            player1MovementText.text = "Movement: 0.00";
-        }
-
-        if (turnTimer < 0f)
-        {
-            timerText.text = ("0.00");
+            if (movementLimit > 0f)
+            {
+                player1MovementText.text = "Movement: " + movementLimit.ToString("F2");
+            } else
+            {
+                player1MovementText.text = "Movement: 0.00";
+            }
         } else
         {
+            player1MovementText.text = "Movement: --";
+        }
+
+        if (currentState == BattleStates.Player2Turn)
+        {
+            if (movementLimit > 0f)
+            {
+                player2MovementText.text = "Movement: " + movementLimit.ToString("F2");
+            }
+            else
+            {
+                player2MovementText.text = "Movement: 0.00";
+            }
+        }
+        else
+        {
+            player2MovementText.text = "Movement: --";
+        }
+
+        if (turnTimer > 0f)
+        {
             timerText.text = turnTimer.ToString("F2");
+        } else
+        {
+            timerText.text = ("0.00");
         }
 
         // Checks and perform the proper state
@@ -145,8 +163,9 @@ public class BattleStateManager : MonoBehaviour {
                         GameObject player1 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
                         player1.layer = 9;
                         player1.GetComponent<SpriteRenderer>().color = new Color(0, 171, 255);
-                        player1Controller = player1.GetComponent<PlayerController>();
 
+                        player1Controllers.Add(player1.GetComponent<PlayerController>());
+                        
                         currentState = BattleStates.SpawnPlayer2;
                     }
                 }
@@ -166,18 +185,32 @@ public class BattleStateManager : MonoBehaviour {
                         GameObject player2 = Instantiate(player, new Vector3(mousePos.x, mousePos.y, 0), Quaternion.identity);
                         player2.layer = 10;
                         player2.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0);
-                        player2Controller = player2.GetComponent<PlayerController>();
 
-                        spawnPrompter.text = "";
-                        currentState = BattleStates.StartGame;
+                        player2Controllers.Add(player2.GetComponent<PlayerController>());
+
+                        if (player2Controllers.Count == numberOfCharacter)
+                        {
+                            spawnPrompter.text = "";
+                            currentState = BattleStates.StartGame;
+                        } else
+                        {
+                            currentState = BattleStates.SpawnPlayer1;
+                        }
                     }
                 }
                 break;
             case (BattleStates.StartGame):
-                player1Controller.gameStart(true);
-                player2Controller.gameStart(false);
+                foreach (PlayerController player1Controller in player1Controllers)
+                {
+                    player1Controller.gameStart(true);
+                }
 
-                tracking = true;
+                foreach (PlayerController player2Controller in player2Controllers)
+                {
+                    player2Controller.gameStart(false);
+                }
+
+                cameraMoving = true;
 
                 currentState = BattleStates.StartPlayer1Turn;
                 break;
@@ -185,10 +218,10 @@ public class BattleStateManager : MonoBehaviour {
                 // Start Player 1 Turn
                 prompter.text = "PLAYER 1 TURN";
 
-                if (tracking)
+                if (cameraMoving)
                 {
-                    cameraScript.CameraTracking(player1Controller.gameObject.transform.position, promptFadeDuration);
-                    tracking = false;
+                    cameraScript.CameraMovement(new Vector3(0, 0, 0), originalZoom, promptFadeDuration);
+                    cameraMoving = false;
                 }
 
                 if (fadeAnimationState == "Fade In")
@@ -218,16 +251,17 @@ public class BattleStateManager : MonoBehaviour {
                 }
                 else if (fadeTimePassed > promptFadeDuration && fadeAnimationState == "Fade Out")
                 {
-                    player1Controller.startTurn();
                     fadeAnimationState = "Fade In";
                     fadeTimePassed = 0f;
 
+                    movementLimit = setMovementLimit;
                     currentState = BattleStates.Player1Turn;
                 }
                 break;
             case (BattleStates.Player1Turn):
                 turnTimer -= Time.deltaTime;
 
+                /*
                 if (player1Controller.didShoot() && !timerReset)
                 {
                     if (player1Controller.getMoveLimit() == 0f)
@@ -239,6 +273,66 @@ public class BattleStateManager : MonoBehaviour {
                     }
 
                     timerReset = true;
+                }*/
+
+                if (Input.GetKeyDown(KeyCode.W))
+                {
+                    if (currentCharacter == null)
+                    {
+                        currentCharacter = player1Controllers[0];
+                        currentCharacterIndex = 0;
+                        currentCharacter.activateCharacter();
+
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    } else {
+                        currentCharacter.deactivateCharacter();
+                        currentCharacterIndex++;
+                        
+                        if (currentCharacterIndex == player1Controllers.Count)
+                        {
+                            currentCharacterIndex = 0;
+                            currentCharacter = player1Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        } else
+                        {
+                            currentCharacter = player1Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        }
+                    }
+                } else if (Input.GetKeyDown(KeyCode.S))
+                {
+                    if (currentCharacter == null)
+                    {
+                        currentCharacter = player1Controllers[0];
+                        currentCharacterIndex = 0;
+                        currentCharacter.activateCharacter();
+
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    }
+                    else
+                    {
+                        currentCharacter.deactivateCharacter();
+                        currentCharacterIndex--;
+
+                        if (currentCharacterIndex < 0)
+                        {
+                            currentCharacterIndex = player1Controllers.Count - 1;
+                            currentCharacter = player1Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        } else
+                        {
+                            currentCharacter = player1Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        }
+                    }
                 }
 
                 if (turnTimer <= 0f)
@@ -249,9 +343,10 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.EndPlayer1Turn):
                 // End Player 1 Turn
-                player1Controller.endTurn();
+                currentCharacter.deactivateCharacter();
+                currentCharacter = null;
                 turnTimer = setTurnTimer;
-                tracking = true;
+                cameraMoving = true;
 
                 currentState = BattleStates.StartPlayer2Turn;
                 break;
@@ -259,10 +354,10 @@ public class BattleStateManager : MonoBehaviour {
                 // Start Player 2 Turn
                 prompter.text = "PLAYER 2 TURN";
 
-                if (tracking)
+                if (cameraMoving)
                 {
-                    cameraScript.CameraTracking(player2Controller.gameObject.transform.position, promptFadeDuration);
-                    tracking = false;
+                    cameraScript.CameraMovement(new Vector3(0, 0, 0), originalZoom, promptFadeDuration);
+                    cameraMoving = false;
                 }
 
                 if (fadeAnimationState == "Fade In")
@@ -292,16 +387,17 @@ public class BattleStateManager : MonoBehaviour {
                 }
                 else if (fadeTimePassed > promptFadeDuration && fadeAnimationState == "Fade Out")
                 {
-                    player2Controller.startTurn();
                     fadeAnimationState = "Fade In";
                     fadeTimePassed = 0f;
 
+                    movementLimit = setMovementLimit;
                     currentState = BattleStates.Player2Turn;
                 }
                 break;
             case (BattleStates.Player2Turn):
                 turnTimer -= Time.deltaTime;
 
+                /*
                 if (player2Controller.didShoot() && !timerReset)
                 {
                     if (player2Controller.getMoveLimit() == 0f)
@@ -314,6 +410,71 @@ public class BattleStateManager : MonoBehaviour {
                     }
 
                     timerReset = true;
+                }*/
+
+                if (Input.GetKeyDown(KeyCode.W))
+                {
+                    if (currentCharacter == null)
+                    {
+                        currentCharacter = player2Controllers[0];
+                        currentCharacterIndex = 0;
+                        currentCharacter.activateCharacter();
+
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    }
+                    else
+                    {
+                        currentCharacter.deactivateCharacter();
+                        currentCharacterIndex++;
+
+                        if (currentCharacterIndex == player2Controllers.Count)
+                        {
+                            currentCharacterIndex = 0;
+                            currentCharacter = player2Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        }
+                        else
+                        {
+                            currentCharacter = player2Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        }
+                    }
+                }
+                else if (Input.GetKeyDown(KeyCode.S))
+                {
+                    if (currentCharacter == null)
+                    {
+                        currentCharacter = player2Controllers[0];
+                        currentCharacterIndex = 0;
+                        currentCharacter.activateCharacter();
+
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    }
+                    else
+                    {
+                        currentCharacter.deactivateCharacter();
+                        currentCharacterIndex--;
+
+                        if (currentCharacterIndex < 0)
+                        {
+                            currentCharacterIndex = player2Controllers.Count - 1;
+                            currentCharacter = player2Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        }
+                        else
+                        {
+                            currentCharacter = player2Controllers[currentCharacterIndex];
+                            currentCharacter.activateCharacter();
+
+                            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        }
+                    }
                 }
 
                 if (turnTimer <= 0f)
@@ -324,9 +485,10 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.EndPlayer2Turn):
                 // End Player 2 Turn
-                player2Controller.endTurn();
+                currentCharacter.deactivateCharacter();
+                currentCharacter = null;
                 turnTimer = setTurnTimer;
-                tracking = true;
+                cameraMoving = true;
 
                 currentState = BattleStates.StartPlayer1Turn;
                 break;
@@ -337,13 +499,17 @@ public class BattleStateManager : MonoBehaviour {
                     initialGameOver = false;
                 }
 
-                if (player1Controller != null)
+                if (currentCharacter != null)
                 {
-                    player1Controller.endTurn();
+                    currentCharacter.deactivateCharacter();
+                    currentCharacter = null;
+                }
+
+                if (player1Controllers.Count != 0)
+                {
                     prompter.text = "Player 1 Wins!";
-                } else if (player2Controller != null)
+                } else if (player2Controllers.Count != 0)
                 {
-                    player2Controller.endTurn();
                     prompter.text = "Player 2 Wins!";
                 }
 
@@ -359,11 +525,22 @@ public class BattleStateManager : MonoBehaviour {
     
     public bool checkedPlayersDead()
     {
-        return (player1Controller == null || player2Controller == null);
+        return (player1Controllers.Count == 0 || player2Controllers.Count == 0);
     }
 
     public bool checkIfInitialStates()
     {
         return (currentState != BattleStates.GenerateMap && currentState != BattleStates.SpawnPlayer1 && currentState != BattleStates.SpawnPlayer2);
+    }
+
+    public void deleteCharacter(bool isPlayer1, PlayerController controller)
+    {
+        if (isPlayer1)
+        {
+            player1Controllers.Remove(controller);
+        } else
+        {
+            player2Controllers.Remove(controller);
+        }
     }
 }

@@ -6,33 +6,33 @@ public class CameraScript : MonoBehaviour {
     public float movementSpeed;
 
     public float dragSpeed;
-    public float zoom;
 
     private Vector3 dragOrigin;
-
-    private Vector3 playerPos;
-    private Vector3 originalPos;
-    private float originalZoom;
+    
+    private Vector3 startingPos;
+    private Vector3 newPosition;
+    private float startingZoom;
+    private float newZoom;
     private float trackingDuration;
     private float timePassed;
-    private bool tracking;
+    private bool moving;
 
     private void Awake()
     {
-        tracking = false;
+        moving = false;
     }
 
     void Update () {
-        if (tracking)
+        if (moving)
         {
             timePassed += Time.deltaTime;
             
-            transform.position = Vector3.Lerp(originalPos, playerPos, timePassed / trackingDuration);
-            Camera.main.orthographicSize = Mathf.Lerp(originalZoom, zoom, timePassed / trackingDuration);
+            transform.position = Vector3.Lerp(startingPos, newPosition, timePassed / trackingDuration);
+            Camera.main.orthographicSize = Mathf.Lerp(startingZoom, newZoom, timePassed / trackingDuration);
 
             if (timePassed > trackingDuration)
             {
-                tracking = false;
+                moving = false;
             }
         } else
         {
@@ -63,14 +63,15 @@ public class CameraScript : MonoBehaviour {
         }
     }
 
-    public void CameraTracking(Vector3 position, float duration)
+    public void CameraMovement(Vector3 position, float zoom, float duration)
     {
-        tracking = true;
-        playerPos = position;
-        playerPos.z = -10;
+        moving = true;
+        newPosition = position;
+        newPosition.z = -10;
+        newZoom = zoom;
         trackingDuration = duration;
-        originalPos = transform.position;
-        originalZoom = Camera.main.orthographicSize;
+        startingPos = transform.position;
+        startingZoom = Camera.main.orthographicSize;
         timePassed = 0f;
     }
 }
