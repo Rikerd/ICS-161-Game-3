@@ -145,6 +145,13 @@ public class BattleStateManager : MonoBehaviour {
             timerText.text = ("0.00");
         }
 
+        // Lock Camera
+        if (currentCharacter != null && Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, true);
+            cameraScript.SetCurrentCharacter(currentCharacter.transform);
+        }
+
         // Checks and perform the proper state
         switch (currentState)
         {
@@ -224,7 +231,7 @@ public class BattleStateManager : MonoBehaviour {
 
                 if (cameraMoving)
                 {
-                    cameraScript.CameraMovement(new Vector3(0, 0, 0), originalZoom, promptFadeDuration);
+                    cameraScript.CameraMovement(new Vector3(0, 0, 0), originalZoom, promptFadeDuration, false);
                     cameraMoving = false;
                 }
 
@@ -265,7 +272,7 @@ public class BattleStateManager : MonoBehaviour {
                     currentCharacterIndex = 0;
                     currentCharacter.activateCharacter();
 
-                    cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
 
                     currentState = BattleStates.Player1Turn;
                 }
@@ -288,6 +295,7 @@ public class BattleStateManager : MonoBehaviour {
 
                 if (Input.GetKeyDown(KeyCode.W))
                 {
+                    cameraScript.deactiveCameraLock();
                     currentCharacter.deactivateCharacter();
                     currentCharacterIndex++;
 
@@ -297,17 +305,18 @@ public class BattleStateManager : MonoBehaviour {
                         currentCharacter = player1Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                     else
                     {
                         currentCharacter = player1Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                 } else if (Input.GetKeyDown(KeyCode.S))
                 {
+                    cameraScript.deactiveCameraLock();
                     currentCharacter.deactivateCharacter();
                     currentCharacterIndex--;
 
@@ -317,14 +326,14 @@ public class BattleStateManager : MonoBehaviour {
                         currentCharacter = player1Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                     else
                     {
                         currentCharacter = player1Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                 }
 
@@ -336,6 +345,7 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.EndPlayer1Turn):
                 // End Player 1 Turn
+                cameraScript.deactiveCameraLock();
                 currentCharacter.deactivateCharacter();
                 currentCharacter = null;
                 turnTimer = setTurnTimer;
@@ -349,7 +359,7 @@ public class BattleStateManager : MonoBehaviour {
 
                 if (cameraMoving)
                 {
-                    cameraScript.CameraMovement(new Vector3(0, 0, 0), originalZoom, promptFadeDuration);
+                    cameraScript.CameraMovement(new Vector3(0, 0, 0), originalZoom, promptFadeDuration, false);
                     cameraMoving = false;
                 }
 
@@ -390,7 +400,7 @@ public class BattleStateManager : MonoBehaviour {
                     currentCharacterIndex = 0;
                     currentCharacter.activateCharacter();
 
-                    cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                    cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
 
                     currentState = BattleStates.Player2Turn;
                 }
@@ -414,6 +424,7 @@ public class BattleStateManager : MonoBehaviour {
 
                 if (Input.GetKeyDown(KeyCode.W))
                 {
+                    cameraScript.deactiveCameraLock();
                     currentCharacter.deactivateCharacter();
                     currentCharacterIndex++;
 
@@ -423,18 +434,19 @@ public class BattleStateManager : MonoBehaviour {
                         currentCharacter = player2Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                     else
                     {
                         currentCharacter = player2Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                 }
                 else if (Input.GetKeyDown(KeyCode.S))
                 {
+                    cameraScript.deactiveCameraLock();
                     currentCharacter.deactivateCharacter();
                     currentCharacterIndex--;
 
@@ -444,14 +456,14 @@ public class BattleStateManager : MonoBehaviour {
                         currentCharacter = player2Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                     else
                     {
                         currentCharacter = player2Controllers[currentCharacterIndex];
                         currentCharacter.activateCharacter();
 
-                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration);
+                        cameraScript.CameraMovement(currentCharacter.transform.position, playerZoom, cameraTrackingDuration, false);
                     }
                 }
 
@@ -463,6 +475,7 @@ public class BattleStateManager : MonoBehaviour {
                 break;
             case (BattleStates.EndPlayer2Turn):
                 // End Player 2 Turn
+                cameraScript.deactiveCameraLock();
                 currentCharacter.deactivateCharacter();
                 currentCharacter = null;
                 turnTimer = setTurnTimer;
@@ -473,6 +486,7 @@ public class BattleStateManager : MonoBehaviour {
             case (BattleStates.GameOver):
                 if (initialGameOver)
                 {
+                    cameraScript.deactiveCameraLock();
                     prompter.color = prompterOriginalColor;
                     initialGameOver = false;
                 }

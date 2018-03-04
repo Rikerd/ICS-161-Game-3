@@ -457,6 +457,8 @@ MonoBehaviour:
 
     Mouse Wheel: Zoom
 
+    Left CTRL: Camera Lock
+
     Esc Key: Pause'
 --- !u!222 &682644212
 CanvasRenderer:

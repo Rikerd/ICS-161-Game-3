@@ -678,8 +678,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 768.00006, y: -570.8866}
-  m_SizeDelta: {x: 1036.0001, y: 358.18207}
+  m_AnchoredPosition: {x: 768.00006, y: -571.459}
+  m_SizeDelta: {x: 1036.0001, y: 393.79678}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &260239425
 MonoBehaviour:
@@ -722,7 +722,9 @@ MonoBehaviour:
 
     Right Click Drag: Move Camera
 
-    Mouse Wheel: Zoom'
+    Mouse Wheel: Zoom
+
+    Left Ctrl: Camera Lock'
 --- !u!222 &260239426
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -4304,8 +4306,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 768.00006, y: -795.4929}
-  m_SizeDelta: {x: 1036.0001, y: 171.03079}
+  m_AnchoredPosition: {x: 768.00006, y: -804.603}
+  m_SizeDelta: {x: 1036.0001, y: 152.49127}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &503176621
 MonoBehaviour:
@@ -5477,8 +5479,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 768.00006, y: -315.89777}
-  m_SizeDelta: {x: 1036.0001, y: 231.7955}
+  m_AnchoredPosition: {x: 768.00006, y: -307.28027}
+  m_SizeDelta: {x: 1036.0001, y: 214.56058}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1479591652
 MonoBehaviour:

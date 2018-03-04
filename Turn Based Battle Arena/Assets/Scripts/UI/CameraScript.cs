@@ -17,12 +17,23 @@ public class CameraScript : MonoBehaviour {
     private float timePassed;
     private bool moving;
 
+    private bool cameraLock;
+    private bool tracking;
+    private Transform trackedCharacter;
+
     private void Awake()
     {
         moving = false;
+
+        tracking = false;
     }
 
     void Update () {
+        if (tracking)
+        {
+            transform.position = new Vector3(trackedCharacter.position.x, trackedCharacter.position.y, -10);
+        }
+
         if (moving)
         {
             timePassed += Time.deltaTime;
@@ -33,21 +44,29 @@ public class CameraScript : MonoBehaviour {
             if (timePassed > trackingDuration)
             {
                 moving = false;
+
+                if (cameraLock)
+                {
+                    tracking = true;
+                }
             }
         } else
         {
             if (Input.GetAxis("Mouse ScrollWheel") > 0)
             {
                 Camera.main.orthographicSize--;
+                tracking = false;
             }
             else if (Input.GetAxis("Mouse ScrollWheel") < 0)
             {
                 Camera.main.orthographicSize++;
+                tracking = false;
             }
 
             if (Input.GetMouseButtonDown(1))
             {
                 dragOrigin = Input.mousePosition;
+                tracking = false;
                 return;
             }
 
@@ -63,7 +82,7 @@ public class CameraScript : MonoBehaviour {
         }
     }
 
-    public void CameraMovement(Vector3 position, float zoom, float duration)
+    public void CameraMovement(Vector3 position, float zoom, float duration, bool cameraTracking)
     {
         moving = true;
         newPosition = position;
@@ -73,5 +92,17 @@ public class CameraScript : MonoBehaviour {
         startingPos = transform.position;
         startingZoom = Camera.main.orthographicSize;
         timePassed = 0f;
+
+        cameraLock = cameraTracking;
+    }
+
+    public void SetCurrentCharacter(Transform character)
+    {
+        trackedCharacter = character;
+    }
+
+    public void deactiveCameraLock()
+    {
+        tracking = false;
     }
 }
